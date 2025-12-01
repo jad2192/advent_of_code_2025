@@ -8,11 +8,10 @@ def count_zeros(instructions: list[str]) -> tuple[int, int]:
     for step in instructions:
         dxn, mag = DXN[step[0]], int(step[1:])
         rotations, mag = abs(mag) // 100, mag % 100
-        starts_at_zero = int(pos) % 100 == 0
         pos = pos + (dxn * mag)
-        crosses_zero = (pos * (pos - dxn * mag) <= 0) or (pos >= 100)
+        crosses_zero = not (0 < pos < 100) and ((pos - dxn * mag) % 100 > 0)
         count_end += pos % 100 == 0
-        count_pass += rotations + crosses_zero - starts_at_zero
+        count_pass += rotations + crosses_zero
         pos = pos % 100
     return count_end, count_pass
 
