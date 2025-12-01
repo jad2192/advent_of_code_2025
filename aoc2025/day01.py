@@ -36,7 +36,7 @@ assert test_res == 3
 test_res2 = count_zeros_passing(test_instructions)
 assert test_res2 == 6
 
-# Part 1
+# Solutions
 instructions = load_input(1, "main").split("\n")
 part_1 = count_zeros_terminating(instructions)
 print(f"Part 1: {part_1}")
