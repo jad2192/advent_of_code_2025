@@ -2,15 +2,12 @@ from aoc2025 import load_input
 
 
 class Diagram:
-    def __init__(self, diagram_list: list[str]):
-        self.num_rows = len(diagram_list)
-        self.num_cols = len(diagram_list[0])
-        self.grid: dict[complex, str] = {
-            complex(col, row): chr
-            for row in range(self.num_rows)
-            for col, chr in enumerate(diagram_list[row])
-            if chr == "@"
-        }
+    def __init__(self, diagram: list[str]):
+        self.num_rows = len(diagram)
+        self.num_cols = len(diagram[0])
+        self.grid: set[complex] = set(
+            complex(col, row) for row in range(self.num_rows) for col, chr in enumerate(diagram[row]) if chr == "@"
+        )
         self.accessible_roll_coords = set()
 
     def get_neighbors(self, z: complex) -> list[complex]:
@@ -29,7 +26,7 @@ class Diagram:
         removed_rolls = 0
         while self.get_accessible_rolls() > 0:
             removed_rolls += len(self.accessible_roll_coords)
-            self.grid = {z: chr for z, chr in self.grid.items() if z not in self.accessible_roll_coords}
+            self.grid = self.grid.difference(self.accessible_roll_coords)
             self.accessible_roll_coords = set()
         return removed_rolls
 
