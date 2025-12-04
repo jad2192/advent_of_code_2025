@@ -17,11 +17,12 @@ class Diagram:
     def get_accessible_rolls(self) -> int:
         accessible_rolls = 0
         for coord in self.grid:
-            if self.grid[coord] == "@":
-                neighbor_rolls = [self.grid[z] for z in self.get_neighbors(coord) if self.grid[z] == "@"]
-                if len(neighbor_rolls) < 4:
-                    accessible_rolls += 1
-                    self.accessible_roll_coords.add(coord)
+            if self.grid[coord] != "@":
+                continue
+            neighbor_rolls = [self.grid[z] for z in self.get_neighbors(coord) if self.grid[z] == "@"]
+            if len(neighbor_rolls) < 4:
+                accessible_rolls += 1
+                self.accessible_roll_coords.add(coord)
         return accessible_rolls
 
     def count_removed_rolls(self) -> int:
