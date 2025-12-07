@@ -23,16 +23,6 @@ class ManifoldDiagram:
             self.beam_splits.add(beam_pos + 1j)
         return [beam_pos + z for z in dxns if beam_pos + z in self.grid]
 
-    def count_beam_splits(self) -> int:
-        dfs_stack = [self.start]
-        seen = {self.start}
-        while dfs_stack:
-            cur_pos = dfs_stack.pop()
-            children = [z for z in self.beam_path(cur_pos) if z not in seen]
-            dfs_stack.extend(children)
-            seen.update(children)
-        return len(self.beam_splits)
-
     def count_possible_timelines(self, root: complex | None = None) -> int:
         root = root or self.start
         if root in self.path_memo:
@@ -49,10 +39,14 @@ class ManifoldDiagram:
 
 # Test
 test_diagram = ManifoldDiagram(load_input(day=7, file="test"))
-assert test_diagram.count_beam_splits() == 21
-assert test_diagram.count_possible_timelines() == 40
+timelines = test_diagram.count_possible_timelines()
+beam_splits = len(test_diagram.beam_splits)
+assert beam_splits == 21
+assert timelines == 40
 
 # Main
 diagram = ManifoldDiagram(load_input(day=7, file="main"))
-print(f"Part 1: {diagram.count_beam_splits()}")
-print(f"Part 2: {diagram.count_possible_timelines()}")
+timelines = diagram.count_possible_timelines()
+beam_splits = len(diagram.beam_splits)
+print(f"Part 1: {beam_splits}")
+print(f"Part 2: {timelines}")
