@@ -8,7 +8,7 @@ class Diagram:
         self.grid: set[complex] = set(
             complex(col, row) for row in range(self.num_rows) for col, chr in enumerate(diagram[row]) if chr == "@"
         )
-        self.accessible_roll_coords = set()
+        self.accessible_roll_coords: set[complex] = set()
 
     def get_neighbors(self, z: complex) -> list[complex]:
         dxns: list[complex] = [1, -1, 1j, -1j, 1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j]
