@@ -25,25 +25,11 @@ class JunctionBoxArray:
         return len(connected_components[0]) * len(connected_components[1]) * len(connected_components[2])
 
     def largest_extension_length(self, start: int) -> int:
-        ix, delta, ceiling = start, start, None
-        found = False
-        while not found:
-            prev_circuits = list(self.circuits)
-            self.merge_circuits(n_connections=delta, start_ix=ix)
-            if len(self.circuits[0]) < len(self.box_locs):
-                ix += delta
-                if ceiling is None:
-                    pass
-                else:
-                    delta = max(1, int(ceiling - ix) // 2)
-            else:
-                if delta == 1:
-                    found = True
-                else:
-                    ceiling = ix + int(delta)
-                    self.circuits = prev_circuits
-                    delta = max(1, int(ceiling - ix) // 2)
-        k, j = self.sorted_dists[ix]
+        ix = start
+        while len(self.circuits[0]) < len(self.box_locs):
+            self.merge_circuits(n_connections=1, start_ix=ix)
+            ix += 1
+        k, j = self.sorted_dists[ix - 1]
         return self.box_locs[k][0] * self.box_locs[j][0]
 
 
