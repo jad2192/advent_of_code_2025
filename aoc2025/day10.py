@@ -9,7 +9,7 @@ from aoc2025 import load_input
 
 class Machine:
     def __init__(self, diagram_str: str):
-        self.req_light: tuple[bool] = tuple([(chr == "#") for chr in diagram_str.split("]")[0][1:]])
+        self.req_light: tuple[bool, ...] = tuple([(chr == "#") for chr in diagram_str.split("]")[0][1:]])
         joltages = diagram_str.split("]")[1].split("{")[1][:-1].split(",")
         self.req_joltage: list[int] = [int(jolt) for jolt in joltages]
         but_str = diagram_str.split("]")[1].split("{")[0].split()
@@ -22,28 +22,11 @@ class Machine:
             self.buttons.append(cur_butt)
 
     @staticmethod
-    def push_button(light: tuple[int, ...], button: tuple[int, ...]):
+    def push_button(light: tuple[bool, ...], button: tuple[int, ...]):
         new_light = list(light)
         for k, v in enumerate(button):
             new_light[k] = not light[k] if v else light[k]
         return tuple(new_light)
-
-    @staticmethod
-    def parallel(v1: tuple[int, ...], v2: tuple[int, ...]) -> int:
-        zeros1 = [k for k, v in enumerate(v1) if v == 0]
-        zeros2 = [k for k, v in enumerate(v2) if v == 0]
-        if zeros1 != zeros2:
-            return -1
-        non_zeros = [k for k, v in enumerate(v2) if v != 0]
-        if min(v1[non_zeros[0]] % v2[non_zeros[0]], v2[non_zeros[0]] % v1[non_zeros[0]]) > 0:
-            return -1
-        ratios = set(v1[k] / v2[k] for k in range(len(v1)) if k not in zeros1)
-        if len(ratios) == 1:
-            if v1[non_zeros[0]] % v2[non_zeros[0]] == 0:
-                return v1[non_zeros[0]] // v2[non_zeros[0]]
-            else:
-                return v2[non_zeros[0]] // v1[non_zeros[0]]
-        return -1
 
     def djikstra(self) -> int:
         presses = {self.req_light: 0}
