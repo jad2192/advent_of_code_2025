@@ -10,19 +10,28 @@ class FloorGrid:
             dxn = (z2 - z1) / abs(z2 - z1)
             for t in range(0, int(abs(z2 - z1)) + 1):
                 self.boundary.add(z1 + t * dxn)
-        self.exterior = set()
+        self.exterior: dict[tuple[int, str], set[complex]] = dict()
         min_x = min(z.real for z in self.boundary)
         root = [z for z in self.boundary if z.real == min_x][0] - 1
         dfs_stack = [root]
+        seen = set()
         dxn1, dxn2 = {1, -1, 1j, -1j}, {1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j}
         while dfs_stack:
             z = dfs_stack.pop()
-            self.exterior.add(z)
+            if (int(z.real), "x") in self.exterior:
+                self.exterior[(int(z.real), "x")].add(z)
+            else:
+                self.exterior[(int(z.real), "x")] = {z}
+            if (int(z.imag), "y") in self.exterior:
+                self.exterior[(int(z.imag), "y")].add(z)
+            else:
+                self.exterior[(int(z.imag), "y")] = {z}
+            seen.add(z)
             for w in dxn1:
                 if all(
                     [
                         z + w not in self.boundary,
-                        z + w not in self.exterior,
+                        z + w not in seen,
                         any(z + w + u in self.boundary for u in dxn1.union(dxn2)),
                     ]
                 ):
@@ -33,14 +42,16 @@ class FloorGrid:
         return int((abs(z1.real - z2.real) + 1) * (abs(z1.imag - z2.imag) + 1))
 
     def valid_rectangle(self, z: complex, w: complex) -> bool:
-        x_min, x_max = int(min(z.real, w.real)), int(max(z.real, w.real))
-        y_min, y_max = int(min(z.imag, w.imag)), int(max(z.imag, w.imag))
-        for x in range(x_min, x_max + 1):
-            if complex(x, y_min) in self.exterior or  complex(x, y_max) in self.exterior:
-                return False
-        for y in range(y_min, y_max + 1):
-            if complex(x_min, y) in self.exterior or complex(x_max, y) in self.exterior:
-                return False
+        x_min, x_max = min(z.real, w.real), max(z.real, w.real)
+        y_min, y_max = min(z.imag, w.imag), max(z.imag, w.imag)
+        if any(y_min <= u.imag <= y_max for u in self.exterior[(int(x_min), "x")]):
+            return False
+        if any(y_min <= u.imag <= y_max for u in self.exterior[(int(x_max), "x")]):
+            return False
+        if any(x_min <= u.real <= x_max for u in self.exterior[(int(y_min), "y")]):
+            return False
+        if any(x_min <= u.real <= x_max for u in self.exterior[(int(y_max), "y")]):
+            return False
         return True
 
     def largest_area(self, green_tiles: bool = False) -> int:
@@ -55,6 +66,7 @@ class FloorGrid:
             for z, w in sorted_pairs:
                 if self.valid_rectangle(z, w):
                     return self.tile_area(z, w)
+            return 0
 
 
 # Test
